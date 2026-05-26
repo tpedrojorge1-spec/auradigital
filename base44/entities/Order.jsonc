@@ -1,0 +1,60 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "client_name": {
+      "type": "string",
+      "description": "Nome do cliente"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Email do cliente"
+    },
+    "client_phone": {
+      "type": "string",
+      "description": "Telefone do cliente"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "Essencial",
+        "Profissional",
+        "Premium"
+      ],
+      "description": "Plano contratado"
+    },
+    "plan_price": {
+      "type": "number",
+      "description": "Valor do plano"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "pix",
+        "boleto"
+      ],
+      "description": "Forma de pagamento"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "pago",
+        "cancelado"
+      ],
+      "default": "pendente",
+      "description": "Status do pedido"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es do cliente"
+    }
+  },
+  "required": [
+    "client_name",
+    "client_email",
+    "plan",
+    "plan_price",
+    "payment_method"
+  ]
+}

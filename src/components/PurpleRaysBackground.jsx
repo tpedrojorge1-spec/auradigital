@@ -1,91 +1,110 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 export default function PurpleRaysBackground() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animFrame;
+    let time = 0;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const rays = Array.from({ length: 18 }, (_, i) => ({
+      angle: (i / 18) * Math.PI * 2,
+      speed: 0.0003 + Math.random() * 0.0004,
+      width: 0.012 + Math.random() * 0.018,
+      color1: `hsla(${265 + Math.random() * 40}, 85%, ${50 + Math.random() * 20}%, `,
+      phase: Math.random() * Math.PI * 2,
+      length: 0.65 + Math.random() * 0.35,
+    }));
+
+    const draw = () => {
+      time += 1;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height * 0.52;
+      const maxR = Math.sqrt(cx * cx + cy * cy) * 1.2;
+
+      // Deep background
+      const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR);
+      bg.addColorStop(0, "rgba(30, 5, 55, 0.95)");
+      bg.addColorStop(0.4, "rgba(12, 2, 25, 0.97)");
+      bg.addColorStop(1, "rgba(3, 0, 8, 1)");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Rays
+      rays.forEach((ray) => {
+        const a = ray.angle + time * ray.speed;
+        const pulse = 0.45 + 0.55 * Math.sin(time * 0.012 + ray.phase);
+
+        const x2 = cx + Math.cos(a) * maxR * ray.length;
+        const y2 = cy + Math.sin(a) * maxR * ray.length;
+
+        const grad = ctx.createLinearGradient(cx, cy, x2, y2);
+        grad.addColorStop(0, ray.color1 + (0.0) + ")");
+        grad.addColorStop(0.08, ray.color1 + (0.55 * pulse) + ")");
+        grad.addColorStop(0.35, ray.color1 + (0.28 * pulse) + ")");
+        grad.addColorStop(0.7, ray.color1 + (0.1 * pulse) + ")");
+        grad.addColorStop(1, ray.color1 + "0)");
+
+        const hw = maxR * ray.width * 0.5;
+        const nx = -Math.sin(a) * hw;
+        const ny = Math.cos(a) * hw;
+
+        ctx.beginPath();
+        ctx.moveTo(cx + nx * 0.1, cy + ny * 0.1);
+        ctx.lineTo(x2 + nx, y2 + ny);
+        ctx.lineTo(x2 - nx, y2 - ny);
+        ctx.lineTo(cx - nx * 0.1, cy - ny * 0.1);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+      });
+
+      // Central glow
+      const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 200);
+      cg.addColorStop(0, "rgba(168, 85, 247, 0.18)");
+      cg.addColorStop(0.3, "rgba(124, 58, 237, 0.08)");
+      cg.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = cg;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 200, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Scan line effect
+      const scanY = ((time * 0.5) % (canvas.height + 80)) - 40;
+      const scanGrad = ctx.createLinearGradient(0, scanY - 40, 0, scanY + 40);
+      scanGrad.addColorStop(0, "rgba(168,85,247,0)");
+      scanGrad.addColorStop(0.5, "rgba(168,85,247,0.025)");
+      scanGrad.addColorStop(1, "rgba(168,85,247,0)");
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanY - 40, canvas.width, 80);
+
+      animFrame = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => {
+      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(animFrame);
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* Base dark gradient */}
-      <div className="absolute inset-0 bg-background" />
-      
-      {/* Primary purple radial burst - center */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[140vh] animate-pulse-glow"
-        style={{
-          background: `
-            conic-gradient(
-              from 0deg at 50% 50%,
-              transparent 0deg,
-              rgba(124, 58, 237, 0.08) 10deg,
-              transparent 20deg,
-              transparent 40deg,
-              rgba(139, 92, 246, 0.06) 50deg,
-              transparent 60deg,
-              transparent 90deg,
-              rgba(167, 139, 250, 0.07) 100deg,
-              transparent 110deg,
-              transparent 140deg,
-              rgba(124, 58, 237, 0.09) 150deg,
-              transparent 160deg,
-              transparent 180deg,
-              rgba(139, 92, 246, 0.05) 190deg,
-              transparent 200deg,
-              transparent 230deg,
-              rgba(167, 139, 250, 0.08) 240deg,
-              transparent 250deg,
-              transparent 280deg,
-              rgba(124, 58, 237, 0.06) 290deg,
-              transparent 300deg,
-              transparent 330deg,
-              rgba(139, 92, 246, 0.07) 340deg,
-              transparent 360deg
-            )
-          `,
-        }}
-      />
-
-      {/* Secondary purple glow - top */}
-      <div 
-        className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[80vw] h-[60vh] opacity-30"
-        style={{
-          background: 'radial-gradient(ellipse at center, rgba(124, 58, 237, 0.15) 0%, rgba(139, 92, 246, 0.05) 40%, transparent 70%)',
-        }}
-      />
-
-      {/* Diagonal ray streaks */}
-      <div 
-        className="absolute top-0 left-0 w-full h-full opacity-20"
-        style={{
-          background: `
-            linear-gradient(135deg, transparent 40%, rgba(124, 58, 237, 0.04) 45%, transparent 50%),
-            linear-gradient(225deg, transparent 40%, rgba(139, 92, 246, 0.03) 45%, transparent 50%),
-            linear-gradient(315deg, transparent 35%, rgba(167, 139, 250, 0.05) 42%, transparent 48%),
-            linear-gradient(45deg, transparent 42%, rgba(124, 58, 237, 0.04) 47%, transparent 52%)
-          `,
-        }}
-      />
-
-      {/* Focused violet glow - bottom right */}
-      <div 
-        className="absolute bottom-[10%] right-[15%] w-[40vw] h-[40vh] opacity-20"
-        style={{
-          background: 'radial-gradient(ellipse at center, rgba(139, 92, 246, 0.12) 0%, transparent 60%)',
-        }}
-      />
-
-      {/* Focused violet glow - top left */}
-      <div 
-        className="absolute top-[15%] left-[10%] w-[35vw] h-[35vh] opacity-15"
-        style={{
-          background: 'radial-gradient(ellipse at center, rgba(167, 139, 250, 0.1) 0%, transparent 60%)',
-        }}
-      />
-
-      {/* Subtle noise texture overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 w-full h-full pointer-events-none z-0"
+      style={{ opacity: 1 }}
+    />
   );
 }
