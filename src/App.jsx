@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
+import AuraNot3 from './pages/AuraNot3';
+import AuraNot5 from './pages/AuraNot5';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -32,6 +34,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/aura" element={<AuraNot3 />} />
+      <Route path="/aura-admin" element={<AuraNot5 />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

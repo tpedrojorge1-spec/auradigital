@@ -20,12 +20,11 @@ export default function FooterSection() {
           © {new Date().getFullYear()} Aureon Digital — Todos os direitos reservados
         </p>
 
-        <a
-          href="/admin"
-          className="font-inter text-white/20 text-[10px] tracking-widest hover:text-white/40 transition-colors uppercase"
-        >
-          Área Admin
-        </a>
+        <div className="flex items-center gap-4">
+          <a href="/admin" className="font-inter text-white/20 text-[10px] tracking-widest hover:text-white/40 transition-colors uppercase">Área Admin</a>
+          <a href="/aura" className="font-inter text-white/20 text-[10px] tracking-widest hover:text-white/40 transition-colors uppercase">Aura NOT 3</a>
+          <a href="/aura-admin" className="font-inter text-white/20 text-[10px] tracking-widest hover:text-white/40 transition-colors uppercase">Aura NOT 5</a>
+        </div>
       </div>
     </footer>
   );
