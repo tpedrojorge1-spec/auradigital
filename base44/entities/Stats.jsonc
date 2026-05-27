@@ -1,0 +1,18 @@
+{
+  "name": "Stats",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Chave identificadora da estat\u00edstica (ex: clientes_atendidos)"
+    },
+    "value": {
+      "type": "number",
+      "description": "Valor num\u00e9rico da estat\u00edstica",
+      "default": 0
+    }
+  },
+  "required": [
+    "key"
+  ]
+}
