@@ -215,6 +215,16 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
                   </button>
                 )}
 
+                {order.status === "revisao" && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); changeStatus("concluido"); }}
+                    disabled={updating}
+                    className="px-3 py-2 rounded-xl bg-green-900/20 border border-green-600/40 text-green-300 text-xs font-inter hover:bg-green-900/40 transition-colors flex items-center gap-1.5 font-semibold"
+                  >
+                    <CheckCircle className="w-3 h-3" /> Marcar como Concluído
+                  </button>
+                )}
+
                 {isCancelledStatus(order.status) && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onSoftDelete(order.id); }}
@@ -629,6 +639,18 @@ export default function Admin() {
   const handleStatusChange = async (id, status) => {
     await base44.entities.Order.update(id, { status });
     setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status } : o));
+
+    // Notificação automática ao mudar para Concluído
+    if (status === "concluido") {
+      const order = orders.find((o) => o.id === id);
+      if (order?.client_email) {
+        base44.integrations.Core.SendEmail({
+          to: order.client_email,
+          subject: `✅ Seu projeto foi Concluído — Aureon Digital`,
+          body: `Olá, ${order.client_name}!\n\nÉ com grande satisfação que informamos que o seu projeto (Plano ${order.plan}) foi **concluído com sucesso**! 🎉\n\nSeu site está pronto e disponível. Entraremos em contato em breve com todas as informações de acesso e entrega.\n\nSe tiver qualquer dúvida ou precisar de ajustes finais, estamos à disposição:\nWhatsApp: (99) 98493-0092\nInstagram: @aureon.digital_ofc\n\nObrigado por confiar na Aureon Digital!\n\n— Equipe Aureon Digital`,
+        }).catch(() => {});
+      }
+    }
 
     // Notificação automática ao mudar para Revisão
     if (status === "revisao") {
