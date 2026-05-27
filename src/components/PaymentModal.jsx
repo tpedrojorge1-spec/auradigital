@@ -305,6 +305,10 @@ export default function PaymentModal({ plan, onClose }) {
                 {form.email && (
                   <p className="font-inter text-xs text-purple-400">Confirmação enviada para {form.email}</p>
                 )}
+                <a href="/meus-pedidos"
+                  className="block font-inter text-xs text-white/30 hover:text-white/60 transition-colors mt-1">
+                  Acompanhar pedido →
+                </a>
                 <button onClick={onClose}
                   className="btn-primary-aura px-8 py-3 rounded-xl text-white font-semibold text-sm tracking-wider">
                   Fechar

@@ -38,16 +38,34 @@
     "status": {
       "type": "string",
       "enum": [
-        "pendente",
-        "pago",
+        "aguardando_pagamento",
+        "pagamento_confirmado",
+        "em_desenvolvimento",
+        "revisao",
+        "concluido",
         "cancelado"
       ],
-      "default": "pendente",
+      "default": "aguardando_pagamento",
       "description": "Status do pedido"
     },
     "notes": {
       "type": "string",
       "description": "Observa\u00e7\u00f5es do cliente"
+    },
+    "updates": {
+      "type": "array",
+      "description": "Hist\u00f3rico de atualiza\u00e7\u00f5es do pedido",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [
