@@ -23,16 +23,34 @@ const PIX_KEY = "ef21cdf5-63f7-4461-9289-bc7eaa05e375";
 const PIX_NAME = "PEDRO JORGE LIMA LEITE TAVARES";
 const WHATSAPP_NUMBER = "5599984930092";
 
+// Sanitização: remove HTML/scripts e limita tamanho
+function sanitize(str, maxLen = 300) {
+  return String(str || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/[<>"'`]/g, "")
+    .trim()
+    .slice(0, maxLen);
+}
+
 function validate(form) {
   const errors = {};
-  if (!form.name.trim()) errors.name = "Nome é obrigatório";
-  if (!form.email.trim()) {
+  const name = sanitize(form.name, 100);
+  const email = sanitize(form.email, 150);
+  const phone = sanitize(form.phone, 20);
+
+  if (!name) errors.name = "Nome é obrigatório";
+  else if (name.length < 3) errors.name = "Nome muito curto";
+
+  if (!email) {
     errors.email = "E-mail é obrigatório";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     errors.email = "E-mail inválido";
   }
-  if (form.phone.trim() && !/^\(?\d{2}\)?[\s-]?\d{4,5}[\s-]?\d{4}$/.test(form.phone.replace(/\s/g, ""))) {
+  if (phone && !/^\(?\d{2}\)?[\s-]?\d{4,5}[\s-]?\d{4}$/.test(phone.replace(/\s/g, ""))) {
     errors.phone = "Telefone inválido (ex: (99) 98493-0092)";
+  }
+  if (form.notes && sanitize(form.notes, 500).length > 500) {
+    errors.notes = "Observações muito longas";
   }
   return errors;
 }
@@ -64,13 +82,13 @@ export default function PaymentModal({ plan, onClose }) {
     setErrors({});
     setLoading(true);
     const order = await base44.entities.Order.create({
-      client_name: form.name,
-      client_email: form.email,
-      client_phone: form.phone,
+      client_name: sanitize(form.name, 100),
+      client_email: sanitize(form.email, 150).toLowerCase(),
+      client_phone: sanitize(form.phone, 20),
       plan: plan.name,
       plan_price: pixData.value,
       payment_method: tab,
-      notes: form.notes,
+      notes: sanitize(form.notes, 500),
       status: "pendente",
     });
     setOrderId(order.id);

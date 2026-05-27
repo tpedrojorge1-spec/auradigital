@@ -14,6 +14,40 @@ import PurpleRaysBackground from "../components/PurpleRaysBackground";
 const ADMIN_PASSWORD = "ADMIM2026";
 const MONTHS = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
 
+// ─── Brute-force protection ──────────────────────────────────────
+const MAX_ATTEMPTS = 5;
+const LOCK_DURATION_MS = 5 * 60 * 1000; // 5 minutos
+const BF_KEY = "aureon_admin_bf";
+
+function getBFState() {
+  try { return JSON.parse(sessionStorage.getItem(BF_KEY) || "{}"); } catch { return {}; }
+}
+function setBFState(state) {
+  sessionStorage.setItem(BF_KEY, JSON.stringify(state));
+}
+function isLocked() {
+  const { lockedUntil } = getBFState();
+  return lockedUntil && Date.now() < lockedUntil;
+}
+function getLockRemaining() {
+  const { lockedUntil } = getBFState();
+  if (!lockedUntil) return 0;
+  return Math.max(0, Math.ceil((lockedUntil - Date.now()) / 1000));
+}
+function registerFailedAttempt() {
+  const state = getBFState();
+  const attempts = (state.attempts || 0) + 1;
+  if (attempts >= MAX_ATTEMPTS) {
+    setBFState({ attempts, lockedUntil: Date.now() + LOCK_DURATION_MS });
+  } else {
+    setBFState({ ...state, attempts });
+  }
+  return attempts;
+}
+function resetBFState() {
+  sessionStorage.removeItem(BF_KEY);
+}
+
 const ALL_STATUSES = [
   { key: "aguardando_pagamento", label: "Aguardando Pagamento", icon: Clock, color: "text-yellow-400", bg: "bg-yellow-900/20 border-yellow-700/30" },
   { key: "pagamento_confirmado", label: "Pagamento Confirmado", icon: CreditCard, color: "text-sky-400", bg: "bg-sky-900/20 border-sky-700/30" },
@@ -522,6 +556,19 @@ export default function Admin() {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [lockTimer, setLockTimer] = useState(0);
+
+  // Atualiza o countdown do bloqueio
+  useEffect(() => {
+    if (!isLocked()) return;
+    const interval = setInterval(() => {
+      const rem = getLockRemaining();
+      setLockTimer(rem);
+      if (rem <= 0) clearInterval(interval);
+    }, 1000);
+    setLockTimer(getLockRemaining());
+    return () => clearInterval(interval);
+  }, [loginError]);
   const [tab, setTab] = useState("orders");
   const [orders, setOrders] = useState([]);
   const [trash, setTrash] = useState([]);
@@ -539,12 +586,25 @@ export default function Admin() {
 
   const handleLogin = (e) => {
     e.preventDefault();
+
+    if (isLocked()) {
+      setLoginError(`Conta bloqueada. Aguarde ${getLockRemaining()}s.`);
+      return;
+    }
+
     if (password === ADMIN_PASSWORD) {
+      resetBFState();
       setAuthed(true);
       loadOrders();
     } else {
-      setLoginError("Senha incorreta.");
-      setTimeout(() => setLoginError(""), 3000);
+      const attempts = registerFailedAttempt();
+      if (isLocked()) {
+        setLoginError(`Muitas tentativas. Acesso bloqueado por 5 minutos.`);
+        setLockTimer(getLockRemaining());
+      } else {
+        setLoginError(`Senha incorreta. Tentativa ${attempts}/${MAX_ATTEMPTS}.`);
+        setTimeout(() => setLoginError(""), 3000);
+      }
     }
   };
 
@@ -617,8 +677,16 @@ export default function Admin() {
                   {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {loginError && <p className="font-inter text-red-400 text-xs text-center">{loginError}</p>}
-              <button type="submit" className="w-full btn-primary-aura py-3.5 rounded-xl text-white font-bold tracking-wider text-sm">Entrar</button>
+              {loginError && (
+                <p className="font-inter text-red-400 text-xs text-center bg-red-900/20 border border-red-700/30 rounded-xl px-3 py-2">
+                  {loginError}
+                  {lockTimer > 0 && <span className="block font-bold mt-0.5">{lockTimer}s restantes</span>}
+                </p>
+              )}
+              <button type="submit" disabled={isLocked()}
+                className="w-full btn-primary-aura py-3.5 rounded-xl text-white font-bold tracking-wider text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                {isLocked() ? `Bloqueado (${lockTimer}s)` : "Entrar"}
+              </button>
             </form>
             <div className="mt-6 text-center">
               <a href="/" className="font-inter text-white/30 text-xs hover:text-white/60 transition-colors flex items-center justify-center gap-1">

@@ -1,7 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Send, ChevronDown } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+
+// Sanitização: remove HTML e limita tamanho
+function sanitize(str, maxLen = 500) {
+  return String(str || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/[<>"'`]/g, "")
+    .trim()
+    .slice(0, maxLen);
+}
+
+// Anti-spam: máximo de 1 envio por 60s por sessão
+const SPAM_KEY = "aureon_review_ts";
+function isSpamming() {
+  const last = parseInt(sessionStorage.getItem(SPAM_KEY) || "0", 10);
+  return Date.now() - last < 60_000;
+}
+function markSubmit() {
+  sessionStorage.setItem(SPAM_KEY, String(Date.now()));
+}
 
 const INITIAL_VISIBLE = 6;
 
@@ -81,6 +100,8 @@ export default function ReviewsSection() {
   const [plan, setPlan] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [formError, setFormError] = useState("");
+  const honeypotRef = useRef(null);
 
   useEffect(() => {
     base44.entities.Review.filter({ approved: true }, "-created_date", 100)
@@ -102,14 +123,31 @@ export default function ReviewsSection() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !comment.trim()) return;
+    setFormError("");
+
+    // Honeypot anti-bot
+    if (honeypotRef.current?.value) return;
+
+    // Anti-spam por sessão
+    if (isSpamming()) {
+      setFormError("Aguarde 1 minuto antes de enviar outra avaliação.");
+      return;
+    }
+
+    const cleanName = sanitize(name, 100);
+    const cleanComment = sanitize(comment, 500);
+
+    if (!cleanName || cleanName.length < 3) { setFormError("Informe seu nome completo."); return; }
+    if (!cleanComment || cleanComment.length < 10) { setFormError("Comentário muito curto (mínimo 10 caracteres)."); return; }
+
     setSubmitting(true);
-    const created = await base44.entities.Review.create({
-      author_name: name,
+    markSubmit();
+    await base44.entities.Review.create({
+      author_name: cleanName,
       rating,
-      comment,
+      comment: cleanComment,
       plan,
-      approved: false, // pending moderation
+      approved: false,
     });
     setSubmitting(false);
     setDone(true);
@@ -172,6 +210,10 @@ export default function ReviewsSection() {
               <div className="card-professional rounded-3xl p-8">
                 <h3 className="font-cinzel font-bold text-white text-xl mb-6 text-center tracking-wide">Sua Avaliação</h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Honeypot anti-bot (invisível) */}
+                  <input ref={honeypotRef} type="text" name="website" tabIndex={-1}
+                    autoComplete="off" className="hidden" aria-hidden="true" />
+
                   <div className="flex flex-col items-center gap-1">
                     <StarRating value={rating} onChange={setRating} size="w-8 h-8" />
                     <p className="font-inter text-white/40 text-xs">
@@ -190,6 +232,11 @@ export default function ReviewsSection() {
                   <textarea placeholder="Conte sua experiência com a Aureon Digital..." value={comment}
                     onChange={(e) => setComment(e.target.value)} required rows={4}
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-purple-800/40 text-white placeholder:text-white/25 text-sm focus:outline-none focus:border-purple-500/60 resize-none transition-all" />
+                  {formError && (
+                    <p className="text-xs text-red-400 text-center font-inter bg-red-900/20 border border-red-700/30 rounded-xl px-4 py-2">
+                      {formError}
+                    </p>
+                  )}
                   <button type="submit" disabled={submitting}
                     className="w-full btn-primary-aura py-3.5 rounded-xl text-white font-bold tracking-wider text-sm flex items-center justify-center gap-2">
                     <Send className="w-4 h-4" />
