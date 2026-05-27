@@ -205,6 +205,16 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
                   </button>
                 )}
 
+                {order.status === "em_desenvolvimento" && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); changeStatus("revisao"); }}
+                    disabled={updating}
+                    className="px-3 py-2 rounded-xl bg-orange-900/20 border border-orange-600/40 text-orange-300 text-xs font-inter hover:bg-orange-900/40 transition-colors flex items-center gap-1.5 font-semibold"
+                  >
+                    <Eye className="w-3 h-3" /> Enviar para Revisão
+                  </button>
+                )}
+
                 {isCancelledStatus(order.status) && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onSoftDelete(order.id); }}
@@ -619,6 +629,18 @@ export default function Admin() {
   const handleStatusChange = async (id, status) => {
     await base44.entities.Order.update(id, { status });
     setOrders((prev) => prev.map((o) => o.id === id ? { ...o, status } : o));
+
+    // Notificação automática ao mudar para Revisão
+    if (status === "revisao") {
+      const order = orders.find((o) => o.id === id);
+      if (order?.client_email) {
+        base44.integrations.Core.SendEmail({
+          to: order.client_email,
+          subject: `🔍 Seu projeto entrou em Revisão — Aureon Digital`,
+          body: `Olá, ${order.client_name}!\n\nTemos uma ótima notícia: o seu projeto (Plano ${order.plan}) saiu da etapa de desenvolvimento e agora está em fase de **Revisão**!\n\nIsso significa que em breve você poderá revisar e aprovar o trabalho. Entraremos em contato para apresentar o resultado.\n\nQualquer dúvida, fale conosco:\nWhatsApp: (99) 98493-0092\nInstagram: @aureon.digital_ofc\n\n— Equipe Aureon Digital`,
+        }).catch(() => {});
+      }
+    }
   };
 
   const handleSoftDelete = async (id) => {
