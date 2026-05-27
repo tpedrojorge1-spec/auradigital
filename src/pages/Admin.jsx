@@ -594,6 +594,7 @@ export default function Admin() {
   const [trash, setTrash] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
   const [pendingReviewsCount, setPendingReviewsCount] = useState(0);
 
   useEffect(() => {
@@ -684,10 +685,16 @@ export default function Admin() {
     setTrash((prev) => prev.filter((o) => o.id !== id));
   };
 
-  const filteredOrders = statusFilter === "all" ? orders : orders.filter((o) => {
-    if (statusFilter === "pagamento_confirmado") return isPaidStatus(o.status);
-    if (statusFilter === "aguardando_pagamento") return o.status === "aguardando_pagamento" || o.status === "pendente";
-    return o.status === statusFilter;
+  const filteredOrders = orders.filter((o) => {
+    const matchStatus = statusFilter === "all" ||
+      (statusFilter === "pagamento_confirmado" ? isPaidStatus(o.status) :
+       statusFilter === "aguardando_pagamento" ? (o.status === "aguardando_pagamento" || o.status === "pendente") :
+       o.status === statusFilter);
+    const q = search.toLowerCase().trim();
+    const matchSearch = !q ||
+      o.client_name?.toLowerCase().includes(q) ||
+      o.client_email?.toLowerCase().includes(q);
+    return matchStatus && matchSearch;
   });
 
   // Stats
@@ -807,6 +814,23 @@ export default function Admin() {
                     <p className="font-inter text-white/30 text-[10px] uppercase tracking-wider mt-1">{k.label}</p>
                   </div>
                 ))}
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative mb-4">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar por nome ou e-mail..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-purple-800/40 text-white placeholder:text-white/25 text-sm focus:outline-none focus:border-purple-500/60 focus:ring-1 focus:ring-purple-500/30 transition-all font-inter"
+                />
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                </svg>
+                {search && (
+                  <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors text-lg leading-none">×</button>
+                )}
               </div>
 
               {/* Status Filter */}
