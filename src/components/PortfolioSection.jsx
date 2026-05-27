@@ -5,63 +5,21 @@ import { ExternalLink, ArrowRight } from "lucide-react";
 const PROJECTS = [
   {
     id: 1,
-    title: "Escritório Jefferson Uchoa - Advocacia",
+    title: "Escritório Previdenciário",
     category: "Advocacia",
     before: {
       label: "Antes",
-      desc: "Site em Canva genérico. Sem profissionalismo, lento e sem otimização.",
+      desc: "Layout genérico sem estrutura profissional. Difícil navegação e baixa conversão.",
       color: "from-red-900/30 to-red-950/50",
       border: "border-red-700/20",
-      items: ["❌ Canva genérico", "❌ Sem SEO", "❌ Falta de credibilidade"],
+      image: "https://media.base44.com/images/public/6a1519af3c5bfa671071c0e7/b5ae0c111_CapturadeTela87.png",
     },
     after: {
       label: "Depois",
-      desc: "Site profissional personalizável com identidade visual forte e CTA otimizados.",
+      desc: "Site profissional com navegação clara e destaque nas especialidades com imagens.",
       color: "from-purple-900/30 to-violet-950/50",
       border: "border-purple-600/30",
-      items: ["✅ Design profissional Premium", "✅ Navbar intuitiva", "✅ Foto e especialidades destaque"],
-    },
-    tag: "Premium",
-    tagColor: "text-amber-300 bg-amber-900/20 border-amber-700/30",
-  },
-  {
-    id: 2,
-    title: "Clínica Estética Ana Costa",
-    category: "Saúde & Beleza",
-    before: {
-      label: "Antes",
-      desc: "Página do Instagram desorganizada como único canal de captação.",
-      color: "from-red-900/30 to-red-950/50",
-      border: "border-red-700/20",
-      items: ["❌ Só Instagram", "❌ Sem agendamento online", "❌ Passava falta de confiança"],
-    },
-    after: {
-      label: "Depois",
-      desc: "Site elegante com formulário de agendamento e portfólio de procedimentos.",
-      color: "from-purple-900/30 to-violet-950/50",
-      border: "border-purple-600/30",
-      items: ["✅ Site com portfólio", "✅ Formulário de contato", "✅ Aumento de 40% nas consultas"],
-    },
-    tag: "Profissional",
-    tagColor: "text-violet-300 bg-violet-900/20 border-violet-700/30",
-  },
-  {
-    id: 3,
-    title: "Consultoria Lima & Associados",
-    category: "Consultoria",
-    before: {
-      label: "Antes",
-      desc: "Site antigo, lento e sem identidade visual. Transmitia desprofissionalismo.",
-      color: "from-red-900/30 to-red-950/50",
-      border: "border-red-700/20",
-      items: ["❌ Site de 2015 desatualizado", "❌ Não abria no celular", "❌ Clientes desconfiavam"],
-    },
-    after: {
-      label: "Depois",
-      desc: "Redesign completo com identidade visual forte e carregamento ultrarrápido.",
-      color: "from-purple-900/30 to-violet-950/50",
-      border: "border-purple-600/30",
-      items: ["✅ Design moderno e responsivo", "✅ Carregamento em <2s", "✅ Fechou 2 contratos novos"],
+      image: "https://media.base44.com/images/public/6a1519af3c5bfa671071c0e7/34867d894_CapturadeTela86.png",
     },
     tag: "Premium",
     tagColor: "text-amber-300 bg-amber-900/20 border-amber-700/30",
@@ -135,28 +93,24 @@ export default function PortfolioSection() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                       {/* Before */}
-                      <div className={`bg-gradient-to-br ${project.before.color} p-6 border-r border-purple-800/20`}>
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${project.before.border} mb-3`}>
+                      <div className={`bg-gradient-to-br ${project.before.color} p-6 border-r border-purple-800/20 flex flex-col gap-3`}>
+                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${project.before.border} w-fit`}>
                           <span className="font-inter text-xs font-bold text-red-400">ANTES</span>
                         </div>
-                        <p className="font-inter text-white/50 text-xs mb-4">{project.before.desc}</p>
-                        <ul className="space-y-2">
-                          {project.before.items.map((item, j) => (
-                            <li key={j} className="font-inter text-white/60 text-xs">{item}</li>
-                          ))}
-                        </ul>
+                        <p className="font-inter text-white/50 text-xs">{project.before.desc}</p>
+                        {project.before.image && (
+                          <img src={project.before.image} alt="Antes" className="w-full rounded-lg object-cover h-40" />
+                        )}
                       </div>
                       {/* After */}
-                      <div className={`bg-gradient-to-br ${project.after.color} p-6`}>
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${project.after.border} mb-3`}>
+                      <div className={`bg-gradient-to-br ${project.after.color} p-6 flex flex-col gap-3`}>
+                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${project.after.border} w-fit`}>
                           <span className="font-inter text-xs font-bold text-purple-300">DEPOIS</span>
                         </div>
-                        <p className="font-inter text-white/50 text-xs mb-4">{project.after.desc}</p>
-                        <ul className="space-y-2">
-                          {project.after.items.map((item, j) => (
-                            <li key={j} className="font-inter text-white/70 text-xs">{item}</li>
-                          ))}
-                        </ul>
+                        <p className="font-inter text-white/50 text-xs">{project.after.desc}</p>
+                        {project.after.image && (
+                          <img src={project.after.image} alt="Depois" className="w-full rounded-lg object-cover h-40" />
+                        )}
                       </div>
                     </div>
                   </motion.div>
