@@ -92,28 +92,36 @@ export default function PortfolioSection() {
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               {/* Before */}
-              <div
-                className="relative group rounded-2xl overflow-hidden border border-red-700/30 bg-gradient-to-br from-red-900/30 to-red-950/50 flex items-center justify-center cursor-zoom-in"
-                style={{ height: "400px" }}
-                onClick={() => setLightbox({ src: project.before.image, alt: "Antes" })}
-              >
-                <img src={project.before.image} alt="Antes" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex flex-col items-center justify-center gap-3">
-                  <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-inter text-sm font-bold">ANTES</span>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-inter text-xs font-bold px-3 py-1 rounded-full bg-red-900/30 border border-red-700/40 text-red-400 tracking-widest uppercase">❌ Antes</span>
+                </div>
+                <div
+                  className="relative group rounded-2xl overflow-hidden border border-red-700/30 cursor-zoom-in"
+                  style={{ height: "380px" }}
+                  onClick={() => setLightbox({ src: project.before.image, alt: "Antes" })}
+                >
+                  <img src={project.before.image} alt="Antes" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                    <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
               </div>
 
               {/* After */}
-              <div
-                className="relative group rounded-2xl overflow-hidden border border-purple-600/30 bg-gradient-to-br from-purple-900/30 to-violet-950/50 flex items-center justify-center cursor-zoom-in"
-                style={{ height: "400px" }}
-                onClick={() => setLightbox({ src: project.after.image, alt: "Depois" })}
-              >
-                <img src={project.after.image} alt="Depois" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex flex-col items-center justify-center gap-3">
-                  <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-inter text-sm font-bold">DEPOIS</span>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-inter text-xs font-bold px-3 py-1 rounded-full bg-purple-900/30 border border-purple-600/40 text-purple-300 tracking-widest uppercase">✅ Depois</span>
+                </div>
+                <div
+                  className="relative group rounded-2xl overflow-hidden border border-purple-600/30 cursor-zoom-in"
+                  style={{ height: "380px" }}
+                  onClick={() => setLightbox({ src: project.after.image, alt: "Depois" })}
+                >
+                  <img src={project.after.image} alt="Depois" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                    <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
                 </div>
               </div>
             </motion.div>
