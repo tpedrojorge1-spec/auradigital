@@ -55,6 +55,30 @@ function validate(form) {
   return errors;
 }
 
+// ─── Field component fora do PaymentModal para evitar re-mount a cada render ───
+function Field({ value, onChange, error, label, type = "text", required = false, placeholder = "" }) {
+  return (
+    <div>
+      <label className="font-inter text-xs text-white/50 tracking-wider uppercase block mb-1.5">
+        {label}{required && <span className="text-purple-400 ml-0.5">*</span>}
+      </label>
+      <input
+        type={type}
+        required={required}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-white/25 text-sm focus:outline-none focus:ring-1 transition-all ${error ? "border-red-500/70 focus:ring-red-500/20" : "border-purple-800/40 focus:border-purple-500/60 focus:ring-purple-500/30"}`}
+      />
+      {error && (
+        <p className="flex items-center gap-1 mt-1 text-xs text-red-400">
+          <AlertCircle className="w-3 h-3" />{error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function PaymentModal({ plan, onClose }) {
   const [tab, setTab] = useState("pix");
   const [copied, setCopied] = useState(false);
@@ -63,11 +87,16 @@ export default function PaymentModal({ plan, onClose }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [sendingReceipt, setSendingReceipt] = useState(null); // 'whatsapp' | 'email'
+  const [sendingReceipt, setSendingReceipt] = useState(null);
   const [receiptSent, setReceiptSent] = useState(null);
   const [orderId, setOrderId] = useState(null);
 
   const pixData = PIX_DATA[plan.name] || PIX_DATA.Essencial;
+
+  const updateField = (k, v) => {
+    setForm((prev) => ({ ...prev, [k]: v }));
+    if (errors[k]) setErrors((prev) => ({ ...prev, [k]: null }));
+  };
 
   const copyPixKey = () => {
     navigator.clipboard.writeText(PIX_KEY);
@@ -117,27 +146,6 @@ export default function PaymentModal({ plan, onClose }) {
     setReceiptSent("email");
   };
 
-  const Field = ({ k, label, type = "text", required = false, placeholder = "" }) => (
-    <div>
-      <label className="font-inter text-xs text-white/50 tracking-wider uppercase block mb-1.5">
-        {label}{required && <span className="text-purple-400 ml-0.5">*</span>}
-      </label>
-      <input
-        type={type}
-        required={required}
-        value={form[k]}
-        onChange={(e) => { setForm({ ...form, [k]: e.target.value }); if (errors[k]) setErrors({ ...errors, [k]: null }); }}
-        placeholder={placeholder}
-        className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-white/25 text-sm focus:outline-none focus:ring-1 transition-all ${errors[k] ? "border-red-500/70 focus:ring-red-500/20" : "border-purple-800/40 focus:border-purple-500/60 focus:ring-purple-500/30"}`}
-      />
-      {errors[k] && (
-        <p className="flex items-center gap-1 mt-1 text-xs text-red-400">
-          <AlertCircle className="w-3 h-3" />{errors[k]}
-        </p>
-      )}
-    </div>
-  );
-
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -172,15 +180,18 @@ export default function PaymentModal({ plan, onClose }) {
                   <form onSubmit={handleFormSubmit} className="space-y-4">
                     <p className="font-inter text-white/50 text-sm mb-2">Preencha seus dados para prosseguir.</p>
 
-                    <Field k="name" label="Nome Completo" required placeholder="Seu nome completo" />
-                    <Field k="email" label="E-mail" type="email" required placeholder="seu@email.com" />
-                    <Field k="phone" label="WhatsApp" type="tel" placeholder="(99) 98493-0092" />
+                    <Field label="Nome Completo" required placeholder="Seu nome completo"
+                      value={form.name} onChange={(e) => updateField("name", e.target.value)} error={errors.name} />
+                    <Field label="E-mail" type="email" required placeholder="seu@email.com"
+                      value={form.email} onChange={(e) => updateField("email", e.target.value)} error={errors.email} />
+                    <Field label="WhatsApp" type="tel" placeholder="(99) 98493-0092"
+                      value={form.phone} onChange={(e) => updateField("phone", e.target.value)} error={errors.phone} />
 
                     <div>
                       <label className="font-inter text-xs text-white/50 tracking-wider uppercase block mb-1.5">Observações</label>
                       <textarea
                         value={form.notes}
-                        onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                        onChange={(e) => updateField("notes", e.target.value)}
                         rows={2}
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-purple-800/40 text-white placeholder:text-white/25 text-sm focus:outline-none focus:border-purple-500/60 resize-none transition-all"
                         placeholder="Descreva seu negócio, necessidades especiais..."
