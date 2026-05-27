@@ -8,6 +8,9 @@ import ReviewsSection from "../components/ReviewsSection";
 import ContactSection from "../components/ContactSection";
 import FooterSection from "../components/FooterSection";
 import PaymentModal from "../components/PaymentModal";
+import PortfolioSection from "../components/PortfolioSection";
+import ProcessSection from "../components/ProcessSection";
+import StatsSection from "../components/StatsSection";
 
 export default function Home() {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -19,6 +22,9 @@ export default function Home() {
         <Navbar />
         <HeroSection />
         <ServicesSection />
+        <PortfolioSection />
+        <ProcessSection />
+        <StatsSection />
         <PlansSection onSelectPlan={setSelectedPlan} />
         <ReviewsSection />
         <ContactSection />
