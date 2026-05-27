@@ -67,7 +67,7 @@ const plans = [
       "Melhorias e atualizações",
       "Acompanhamento estratégico",
       "SEO avançado",
-      "Suporte prioritário vitalício",
+      "Suporte de 4 meses",
     ],
   },
 ];
