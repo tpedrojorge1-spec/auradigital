@@ -646,6 +646,7 @@ export default function Admin() {
       const order = orders.find((o) => o.id === id);
       if (order?.client_email) {
         base44.integrations.Core.SendEmail({
+          from_name: "Aureon Digital",
           to: order.client_email,
           subject: `✅ Seu projeto foi Concluído — Aureon Digital`,
           body: `Olá, ${order.client_name}!\n\nÉ com grande satisfação que informamos que o seu projeto (Plano ${order.plan}) foi **concluído com sucesso**! 🎉\n\nSeu site está pronto e disponível. Entraremos em contato em breve com todas as informações de acesso e entrega.\n\nSe tiver qualquer dúvida ou precisar de ajustes finais, estamos à disposição:\nWhatsApp: (99) 98493-0092\nInstagram: @aureon.digital_ofc\n\nObrigado por confiar na Aureon Digital!\n\n— Equipe Aureon Digital`,
@@ -658,6 +659,7 @@ export default function Admin() {
       const order = orders.find((o) => o.id === id);
       if (order?.client_email) {
         base44.integrations.Core.SendEmail({
+          from_name: "Aureon Digital",
           to: order.client_email,
           subject: `🔍 Seu projeto entrou em Revisão — Aureon Digital`,
           body: `Olá, ${order.client_name}!\n\nTemos uma ótima notícia: o seu projeto (Plano ${order.plan}) saiu da etapa de desenvolvimento e agora está em fase de **Revisão**!\n\nIsso significa que em breve você poderá revisar e aprovar o trabalho. Entraremos em contato para apresentar o resultado.\n\nQualquer dúvida, fale conosco:\nWhatsApp: (99) 98493-0092\nInstagram: @aureon.digital_ofc\n\n— Equipe Aureon Digital`,

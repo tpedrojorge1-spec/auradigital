@@ -138,6 +138,7 @@ export default function PaymentModal({ plan, onClose }) {
   const sendReceiptEmail = async () => {
     setSendingReceipt("email");
     await base44.integrations.Core.SendEmail({
+      from_name: "Aureon Digital",
       to: form.email,
       subject: `Confirmação do Pedido — Plano ${plan.name} | Aureon Digital`,
       body: `Olá, ${form.name}!\n\nRecebemos seu pedido do Plano ${plan.name} no valor de R$ ${pixData.value.toLocaleString("pt-BR")}.\n\nForma de pagamento: ${tab === "pix" ? "PIX" : "Boleto"}\n\nAsssim que confirmarmos o pagamento, entraremos em contato para iniciar seu projeto.\n\nQualquer dúvida, fale conosco:\nWhatsApp: (99) 98493-0092\nInstagram: @aureon.digital_ofc\n\nObrigado por escolher a Aureon Digital!\n\n— Equipe Aureon Digital`,
