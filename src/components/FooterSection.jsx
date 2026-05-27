@@ -3,7 +3,7 @@ import React from "react";
 const LOGO_URL = "https://media.base44.com/images/public/6a1519af3c5bfa671071c0e7/af02c3015_WhatsAppImage2026-05-26at001502.jpeg";
 const WHATSAPP_URL = "https://wa.me/5599984930092?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20planos%20da%20Aureon%20Digital!";
 const INSTAGRAM_URL = "https://www.instagram.com/aureon.digital_ofc/";
-const EMAIL = "mailto:aureon.digital@email.com";
+const EMAIL = "mailto:aureondigitalofc@gmail.com";
 
 export default function FooterSection() {
   const year = new Date().getFullYear();
@@ -80,7 +80,7 @@ export default function FooterSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                 </svg>
               </div>
-              <span className="font-inter text-white/40 text-xs group-hover:text-purple-300 transition-colors">aureon.digital@email.com</span>
+              <span className="font-inter text-white/40 text-xs group-hover:text-purple-300 transition-colors">aureondigitalofc@gmail.com</span>
             </a>
           </div>
         </div>

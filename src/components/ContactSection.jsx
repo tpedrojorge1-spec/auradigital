@@ -28,8 +28,8 @@ const contacts = [
   {
     icon: Mail,
     label: "E-mail",
-    value: "aureon.digital@email.com",
-    href: "mailto:aureon.digital@email.com",
+    value: "aureondigitalofc@gmail.com",
+    href: "mailto:aureondigitalofc@gmail.com",
     hoverClass: "hover:border-purple-400/60",
     borderClass: "border-purple-800/30",
   },
