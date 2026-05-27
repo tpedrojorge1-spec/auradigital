@@ -1,28 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ArrowRight, Shield, Star, Users } from "lucide-react";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
 
 const LOGO_URL = "https://media.base44.com/images/public/6a1519af3c5bfa671071c0e7/af02c3015_WhatsAppImage2026-05-26at001502.jpeg";
 
 export default function HeroSection() {
-  const [clientesAtendidos, setClientesAtendidos] = useState(0);
-
-  useEffect(() => {
-    base44.entities.Stats.filter({ key: "clientes_atendidos" })
-      .then((data) => {
-        const val = data?.[0]?.value || 0;
-        // Anima o contador do 0 até o valor real
-        let n = 0;
-        const step = Math.max(1, Math.floor(val / 30));
-        const interval = setInterval(() => {
-          n = Math.min(n + step, val);
-          setClientesAtendidos(n);
-          if (n >= val) clearInterval(interval);
-        }, 50);
-      })
-      .catch(() => setClientesAtendidos(0));
-  }, []);
 
   return (
     <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center pt-20 pb-16 px-6 overflow-hidden">
@@ -122,7 +104,7 @@ export default function HeroSection() {
           className="flex flex-wrap items-center justify-center gap-8 md:gap-12"
         >
           {[
-            { icon: Users, value: `${clientesAtendidos}+`, label: "Clientes Atendidos", color: "text-purple-400" },
+            { icon: Users, value: "100%", label: "Clientes Satisfeitos", color: "text-purple-400" },
             { icon: Star, value: "5.0", label: "Avaliação Média", color: "text-yellow-400" },
             { icon: Shield, value: "100%", label: "Satisfação Garantida", color: "text-green-400" },
           ].map((s, i) => (
