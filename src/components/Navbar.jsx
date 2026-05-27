@@ -23,6 +23,7 @@ export default function Navbar() {
     { label: "Avaliações", href: "#avaliacoes" },
     { label: "Contato", href: "#contato" },
   ];
+  const WHATSAPP_MSG = `https://wa.me/${WHATSAPP_NUMBER}?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20os%20planos%20da%20Aureon%20Digital!`;
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "bg-black/80 backdrop-blur-xl border-b border-purple-900/30 shadow-lg shadow-purple-900/10" : "bg-transparent"}`}>
@@ -81,6 +82,12 @@ export default function Navbar() {
           </a>
 
           <a
+            href="/meus-pedidos"
+            className="font-inter text-xs font-medium tracking-widest text-purple-300/80 hover:text-purple-200 transition-all duration-300 border border-purple-700/40 px-4 py-2 rounded-full hover:border-purple-500/60 hover:bg-purple-900/20"
+          >
+            MEUS PEDIDOS
+          </a>
+          <a
             href="#planos"
             className="btn-primary-aura px-5 py-2 rounded-full text-white text-xs font-semibold tracking-wider shadow-lg shadow-purple-900/30"
           >
@@ -110,6 +117,13 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
+          <a
+            href="/meus-pedidos"
+            onClick={() => setMenuOpen(false)}
+            className="block font-inter text-xs tracking-widest text-purple-300 hover:text-purple-200 py-2 uppercase border-b border-purple-900/20"
+          >
+            📦 Meus Pedidos
+          </a>
           <div className="flex items-center gap-4 pt-2">
             <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer"
               className="w-8 h-8 rounded-full overflow-hidden border border-purple-700/40 hover:brightness-150 transition-all">

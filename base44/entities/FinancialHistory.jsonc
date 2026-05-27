@@ -1,0 +1,43 @@
+{
+  "name": "FinancialHistory",
+  "type": "object",
+  "properties": {
+    "year": {
+      "type": "number",
+      "description": "Ano de refer\u00eancia"
+    },
+    "month": {
+      "type": "number",
+      "description": "M\u00eas de refer\u00eancia (1-12)"
+    },
+    "revenue": {
+      "type": "number",
+      "description": "Receita confirmada no m\u00eas",
+      "default": 0
+    },
+    "orders_count": {
+      "type": "number",
+      "description": "Total de pedidos no m\u00eas",
+      "default": 0
+    },
+    "conversions": {
+      "type": "number",
+      "description": "Pedidos pagos no m\u00eas",
+      "default": 0
+    },
+    "cancellations": {
+      "type": "number",
+      "description": "Cancelamentos no m\u00eas",
+      "default": 0
+    },
+    "closed": {
+      "type": "boolean",
+      "description": "M\u00eas encerrado",
+      "default": false
+    }
+  },
+  "required": [
+    "year",
+    "month"
+  ]
+}
