@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock, Eye, EyeOff, ArrowLeft, Package, CheckCircle, Clock, XCircle,
   TrendingUp, RotateCcw, Trash2, BarChart2, Settings, RefreshCw,
-  Hammer, CreditCard, AlertCircle, ChevronDown
+  Hammer, CreditCard, AlertCircle, ChevronDown, MessageSquare, Star, ShieldCheck, EyeOff as EyeOffIcon
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -37,6 +37,7 @@ const TABS = [
   { key: "orders", label: "Pedidos", icon: Package },
   { key: "trash", label: "Lixeira", icon: Trash2 },
   { key: "finance", label: "Financeiro", icon: BarChart2 },
+  { key: "reviews", label: "Comentários", icon: MessageSquare },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────
@@ -389,6 +390,129 @@ function FinanceTab({ orders }) {
   );
 }
 
+// ─── Reviews Moderation Tab ──────────────────────────────────────
+function ReviewsTab() {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("pending"); // pending | approved | hidden | all
+
+  const loadReviews = async () => {
+    setLoading(true);
+    const data = await base44.entities.Review.list("-created_date", 200);
+    setReviews(data);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadReviews(); }, []);
+
+  const approve = async (id) => {
+    await base44.entities.Review.update(id, { approved: true, hidden: false });
+    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, approved: true, hidden: false } : r));
+  };
+
+  const hide = async (id) => {
+    await base44.entities.Review.update(id, { approved: false, hidden: true });
+    setReviews((prev) => prev.map((r) => r.id === id ? { ...r, approved: false, hidden: true } : r));
+  };
+
+  const remove = async (id) => {
+    await base44.entities.Review.delete(id);
+    setReviews((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  const filtered = reviews.filter((r) => {
+    if (filter === "pending") return !r.approved && !r.hidden;
+    if (filter === "approved") return r.approved === true;
+    if (filter === "hidden") return r.hidden === true;
+    return true;
+  });
+
+  const pendingCount = reviews.filter((r) => !r.approved && !r.hidden).length;
+
+  return (
+    <div className="space-y-4">
+      {/* Filter */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {[
+          { key: "pending", label: `Aguardando (${pendingCount})` },
+          { key: "approved", label: "Aprovados" },
+          { key: "hidden", label: "Ocultos" },
+          { key: "all", label: "Todos" },
+        ].map((f) => (
+          <button key={f.key} onClick={() => setFilter(f.key)}
+            className={`px-3 py-1.5 rounded-full text-xs font-inter transition-all ${filter === f.key ? "bg-purple-700 text-white" : "bg-white/5 text-white/40 border border-white/10 hover:border-purple-700/40"}`}>
+            {f.label}
+          </button>
+        ))}
+        <button onClick={loadReviews} className="ml-auto flex items-center gap-1 text-xs text-purple-400 hover:text-purple-300 transition-colors font-inter">
+          <RefreshCw className="w-3 h-3" /> Atualizar
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16"><div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto" /></div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-16 card-professional rounded-2xl">
+          <MessageSquare className="w-10 h-10 text-white/10 mx-auto mb-3" />
+          <p className="font-cinzel text-white/30 text-sm">Nenhum comentário aqui</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((r) => {
+            const dateStr = r.created_date ? new Date(r.created_date).toLocaleDateString("pt-BR") : "";
+            const stars = Array.from({ length: 5 }, (_, i) => i < (r.rating || 5));
+            return (
+              <div key={r.id} className={`card-professional rounded-2xl p-5 border ${r.approved ? "border-green-700/20" : r.hidden ? "border-red-700/20 opacity-70" : "border-yellow-700/20"}`}>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-700 to-violet-900 flex items-center justify-center font-cinzel font-bold text-white text-sm flex-shrink-0">
+                    {r.author_name?.[0]?.toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <p className="font-cinzel font-semibold text-white text-sm">{r.author_name}</p>
+                      {r.plan && <span className="font-inter text-[10px] text-purple-400/70 bg-purple-900/20 px-2 py-0.5 rounded-full border border-purple-800/30">{r.plan}</span>}
+                      {r.approved && <span className="font-inter text-[10px] text-green-400 bg-green-900/20 px-2 py-0.5 rounded-full border border-green-700/30">✓ Aprovado</span>}
+                      {r.hidden && <span className="font-inter text-[10px] text-red-400 bg-red-900/20 px-2 py-0.5 rounded-full border border-red-700/30">Oculto</span>}
+                      {!r.approved && !r.hidden && <span className="font-inter text-[10px] text-yellow-400 bg-yellow-900/20 px-2 py-0.5 rounded-full border border-yellow-700/30">Pendente</span>}
+                    </div>
+                    <div className="flex items-center gap-0.5 mb-2">
+                      {stars.map((filled, i) => (
+                        <Star key={i} className={`w-3 h-3 ${filled ? "text-yellow-400 fill-yellow-400" : "text-white/20"}`} />
+                      ))}
+                      <span className="font-inter text-white/30 text-[10px] ml-1">{dateStr}</span>
+                    </div>
+                    <p className="font-playfair text-white/60 text-sm italic leading-relaxed">"{r.comment}"</p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-wrap gap-2 mt-4 ml-14">
+                  {!r.approved && (
+                    <button onClick={() => approve(r.id)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-green-900/20 border border-green-700/30 text-green-400 text-xs font-inter hover:bg-green-900/40 transition-colors">
+                      <ShieldCheck className="w-3 h-3" /> Aprovar
+                    </button>
+                  )}
+                  {!r.hidden && (
+                    <button onClick={() => hide(r.id)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-yellow-900/20 border border-yellow-700/30 text-yellow-400 text-xs font-inter hover:bg-yellow-900/40 transition-colors">
+                      <EyeOffIcon className="w-3 h-3" /> Ocultar
+                    </button>
+                  )}
+                  <button onClick={() => remove(r.id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-900/20 border border-red-700/30 text-red-400 text-xs font-inter hover:bg-red-900/40 transition-colors">
+                    <Trash2 className="w-3 h-3" /> Remover
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Admin Page ─────────────────────────────────────────────
 export default function Admin() {
   const [authed, setAuthed] = useState(false);
@@ -400,6 +524,15 @@ export default function Admin() {
   const [trash, setTrash] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [pendingReviewsCount, setPendingReviewsCount] = useState(0);
+
+  useEffect(() => {
+    if (authed) {
+      base44.entities.Review.filter({ approved: false }, "-created_date", 50)
+        .then((d) => setPendingReviewsCount(d.filter(r => !r.hidden).length))
+        .catch(() => {});
+    }
+  }, [authed]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -522,6 +655,9 @@ export default function Admin() {
                   {t.key === "trash" && trash.length > 0 && (
                     <span className="bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center">{trash.length}</span>
                   )}
+                  {t.key === "reviews" && pendingReviewsCount > 0 && (
+                    <span className="bg-yellow-500 text-black text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold">{pendingReviewsCount}</span>
+                  )}
                 </button>
               ))}
             </div>
@@ -609,6 +745,9 @@ export default function Admin() {
 
           {/* FINANCE TAB */}
           {tab === "finance" && <FinanceTab orders={orders} />}
+
+          {/* REVIEWS TAB */}
+          {tab === "reviews" && <ReviewsTab />}
         </div>
       </div>
     </div>

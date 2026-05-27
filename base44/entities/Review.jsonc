@@ -28,8 +28,13 @@
     },
     "approved": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "description": "Se a avalia\u00e7\u00e3o est\u00e1 aprovada"
+    },
+    "hidden": {
+      "type": "boolean",
+      "default": false,
+      "description": "Se a avalia\u00e7\u00e3o foi ocultada pelo admin"
     }
   },
   "required": [
