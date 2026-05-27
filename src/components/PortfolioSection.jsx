@@ -93,23 +93,27 @@ export default function PortfolioSection() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                       {/* Before */}
-                      <div className={`bg-gradient-to-br ${project.before.color} p-6 border-r border-purple-800/20 flex flex-col gap-3`}>
+                      <div className={`bg-gradient-to-br ${project.before.color} p-5 border-r border-purple-800/20 flex flex-col gap-3`}>
                         <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${project.before.border} w-fit`}>
                           <span className="font-inter text-xs font-bold text-red-400">ANTES</span>
                         </div>
                         <p className="font-inter text-white/50 text-xs">{project.before.desc}</p>
                         {project.before.image && (
-                          <img src={project.before.image} alt="Antes" className="w-full rounded-lg object-cover h-40" />
+                          <div className="rounded-xl overflow-hidden border border-red-700/20 bg-black/20">
+                            <img src={project.before.image} alt="Antes" className="w-full object-cover object-top" style={{ height: "220px" }} />
+                          </div>
                         )}
                       </div>
                       {/* After */}
-                      <div className={`bg-gradient-to-br ${project.after.color} p-6 flex flex-col gap-3`}>
+                      <div className={`bg-gradient-to-br ${project.after.color} p-5 flex flex-col gap-3`}>
                         <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${project.after.border} w-fit`}>
                           <span className="font-inter text-xs font-bold text-purple-300">DEPOIS</span>
                         </div>
                         <p className="font-inter text-white/50 text-xs">{project.after.desc}</p>
                         {project.after.image && (
-                          <img src={project.after.image} alt="Depois" className="w-full rounded-lg object-cover h-40" />
+                          <div className="rounded-xl overflow-hidden border border-purple-600/30 bg-black/20">
+                            <img src={project.after.image} alt="Depois" className="w-full object-cover object-top" style={{ height: "220px" }} />
+                          </div>
                         )}
                       </div>
                     </div>

@@ -73,7 +73,7 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="card-professional rounded-2xl border border-purple-800/25 overflow-hidden"
+      className="card-professional rounded-2xl border border-purple-800/25"
     >
       <div className="flex items-start gap-4 p-5 cursor-pointer" onClick={() => setExpanded(!expanded)}>
         {/* Avatar */}
@@ -101,7 +101,7 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="border-t border-purple-800/20 overflow-hidden"
+            className="border-t border-purple-800/20 rounded-b-2xl overflow-visible"
           >
             <div className="p-5 space-y-4">
               {/* Info */}
@@ -123,9 +123,9 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
               )}
 
               {/* Actions */}
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div className="flex flex-wrap gap-2 pt-1" style={{ overflow: "visible" }}>
                 {/* Status dropdown */}
-                <div className="relative">
+                <div className="relative" style={{ zIndex: 100 }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); setStatusOpen(!statusOpen); }}
                     disabled={updating}
@@ -133,25 +133,28 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
                   >
                     {updating ? <span className="w-3 h-3 border border-purple-400 border-t-transparent rounded-full animate-spin" /> : <Settings className="w-3 h-3" />}
                     Alterar status
-                    <ChevronDown className="w-3 h-3" />
+                    <ChevronDown className={`w-3 h-3 transition-transform ${statusOpen ? "rotate-180" : ""}`} />
                   </button>
                   <AnimatePresence>
                     {statusOpen && (
                       <motion.div
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
+                        initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                        transition={{ duration: 0.15 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="absolute left-0 top-full mt-1 z-50 bg-[#0d0720] border border-purple-700/40 rounded-xl shadow-xl overflow-hidden min-w-[200px]"
+                        className="absolute left-0 top-full mt-1 bg-[#0d0720] border border-purple-700/40 rounded-xl shadow-2xl shadow-purple-900/40 min-w-[220px]"
+                        style={{ zIndex: 9999 }}
                       >
                         {activeStatuses.map((s) => (
                           <button
                             key={s.key}
                             onClick={() => changeStatus(s.key)}
-                            className={`w-full flex items-center gap-2 px-4 py-2.5 text-xs font-inter hover:bg-white/5 transition-colors text-left ${s.color} ${order.status === s.key ? "bg-white/5" : ""}`}
+                            className={`w-full flex items-center gap-2 px-4 py-3 text-xs font-inter hover:bg-white/5 transition-colors text-left first:rounded-t-xl last:rounded-b-xl ${s.color} ${order.status === s.key ? "bg-white/5" : ""}`}
                           >
-                            <s.icon className="w-3 h-3" />{s.label}
-                            {order.status === s.key && <span className="ml-auto text-[9px] opacity-60">atual</span>}
+                            <s.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span>{s.label}</span>
+                            {order.status === s.key && <span className="ml-auto text-[9px] opacity-60 bg-white/10 px-1.5 py-0.5 rounded">atual</span>}
                           </button>
                         ))}
                       </motion.div>
