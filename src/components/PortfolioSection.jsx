@@ -27,8 +27,7 @@ const PROJECTS = [
 ];
 
 export default function PortfolioSection() {
-  const [active, setActive] = useState(null);
-  const [lightbox, setLightbox] = useState(null); // { src, alt }
+  const [lightbox, setLightbox] = useState(null);
 
   return (
     <>
@@ -81,8 +80,8 @@ export default function PortfolioSection() {
           </p>
         </motion.div>
 
-        {/* Projects */}
-        <div className="space-y-8">
+        {/* Projects - Before/After Grid */}
+        <div className="space-y-12">
           {PROJECTS.map((project, i) => (
             <motion.div
               key={project.id}
@@ -90,80 +89,32 @@ export default function PortfolioSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
-              {/* Project header */}
+              {/* Before */}
               <div
-                className="card-professional rounded-2xl overflow-hidden cursor-pointer"
-                onClick={() => setActive(active === project.id ? null : project.id)}
+                className="relative group rounded-2xl overflow-hidden border border-red-700/30 bg-gradient-to-br from-red-900/30 to-red-950/50 flex items-center justify-center cursor-zoom-in"
+                style={{ height: "400px" }}
+                onClick={() => setLightbox({ src: project.before.image, alt: "Antes" })}
               >
-                <div className="flex items-center justify-between p-5">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-purple-900/40 border border-purple-700/30 flex items-center justify-center font-cinzel font-bold text-purple-300 text-sm">
-                      {String(i + 1).padStart(2, "0")}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-cinzel font-semibold text-white text-sm">{project.title}</p>
-                        <span className={`font-inter text-[10px] font-bold px-2 py-0.5 rounded-md border ${project.tagColor}`}>
-                          {project.tag}
-                        </span>
-                      </div>
-                      <p className="font-inter text-white/40 text-xs mt-0.5">{project.category}</p>
-                    </div>
-                  </div>
-                  <ArrowRight className={`w-4 h-4 text-purple-400 transition-transform duration-300 ${active === project.id ? "rotate-90" : ""}`} />
+                <img src={project.before.image} alt="Antes" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex flex-col items-center justify-center gap-3">
+                  <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-inter text-sm font-bold">ANTES</span>
                 </div>
+              </div>
 
-                {/* Before / After */}
-                {active === project.id && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="border-t border-purple-800/20"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                      {/* Before */}
-                      <div className={`bg-gradient-to-br ${project.before.color} p-5 border-r border-purple-800/20 flex flex-col gap-3`}>
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${project.before.border} w-fit`}>
-                          <span className="font-inter text-xs font-bold text-red-400">ANTES</span>
-                        </div>
-                        <p className="font-inter text-white/50 text-xs">{project.before.desc}</p>
-                        {project.before.image && (
-                           <div
-                             className="relative group rounded-xl overflow-hidden border border-red-700/20 bg-black/20 flex items-center justify-center cursor-zoom-in"
-                             style={{ height: "280px" }}
-                             onClick={(e) => { e.stopPropagation(); setLightbox({ src: project.before.image, alt: "Antes" }); }}
-                           >
-                             <img src={project.before.image} alt="Antes" className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
-                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
-                               <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                             </div>
-                           </div>
-                         )}
-                      </div>
-                      {/* After */}
-                      <div className={`bg-gradient-to-br ${project.after.color} p-5 flex flex-col gap-3`}>
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${project.after.border} w-fit`}>
-                          <span className="font-inter text-xs font-bold text-purple-300">DEPOIS</span>
-                        </div>
-                        <p className="font-inter text-white/50 text-xs">{project.after.desc}</p>
-                        {project.after.image && (
-                           <div
-                             className="relative group rounded-xl overflow-hidden border border-purple-600/30 bg-black/20 flex items-center justify-center cursor-zoom-in"
-                             style={{ height: "280px" }}
-                             onClick={(e) => { e.stopPropagation(); setLightbox({ src: project.after.image, alt: "Depois" }); }}
-                           >
-                             <img src={project.after.image} alt="Depois" className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
-                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
-                               <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                             </div>
-                           </div>
-                         )}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
+              {/* After */}
+              <div
+                className="relative group rounded-2xl overflow-hidden border border-purple-600/30 bg-gradient-to-br from-purple-900/30 to-violet-950/50 flex items-center justify-center cursor-zoom-in"
+                style={{ height: "400px" }}
+                onClick={() => setLightbox({ src: project.after.image, alt: "Depois" })}
+              >
+                <img src={project.after.image} alt="Depois" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex flex-col items-center justify-center gap-3">
+                  <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity font-inter text-sm font-bold">DEPOIS</span>
+                </div>
               </div>
             </motion.div>
           ))}
