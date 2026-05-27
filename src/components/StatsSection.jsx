@@ -67,7 +67,7 @@ export default function StatsSection() {
   const STATS = [
     {
       icon: Rocket,
-      value: clientesAtendidos,
+      value: 50,
       suffix: "+",
       label: "Projetos Entregues",
       sublabel: "Sites publicados com sucesso",
@@ -76,7 +76,7 @@ export default function StatsSection() {
     },
     {
       icon: Users,
-      value: clientesAtendidos,
+      value: 50,
       suffix: "+",
       label: "Clientes Atendidos",
       sublabel: "Negócios transformados digitalmente",
