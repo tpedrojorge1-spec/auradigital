@@ -5,21 +5,21 @@ import { ExternalLink, ArrowRight } from "lucide-react";
 const PROJECTS = [
   {
     id: 1,
-    title: "Escritório Jurídico Mendonça",
+    title: "Escritório Jefferson Uchoa - Advocacia",
     category: "Advocacia",
     before: {
       label: "Antes",
-      desc: "Sem presença digital. Apenas cartão de visita físico e indicações.",
+      desc: "Site em Canva genérico. Sem profissionalismo, lento e sem otimização.",
       color: "from-red-900/30 to-red-950/50",
       border: "border-red-700/20",
-      items: ["❌ Sem site", "❌ Sem Google Meu Negócio", "❌ Zero credibilidade online"],
+      items: ["❌ Canva genérico", "❌ Sem SEO", "❌ Falta de credibilidade"],
     },
     after: {
       label: "Depois",
-      desc: "Site completo, moderno e otimizado para converter novos clientes.",
+      desc: "Site profissional personalizável com identidade visual forte e CTA otimizados.",
       color: "from-purple-900/30 to-violet-950/50",
       border: "border-purple-600/30",
-      items: ["✅ Site profissional Premium", "✅ Aparece no Google", "✅ +3 novos casos/mês pelo site"],
+      items: ["✅ Design profissional Premium", "✅ Navbar intuitiva", "✅ Foto e especialidades destaque"],
     },
     tag: "Premium",
     tagColor: "text-amber-300 bg-amber-900/20 border-amber-700/30",
