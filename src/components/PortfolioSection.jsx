@@ -99,10 +99,10 @@ export default function PortfolioSection() {
                         </div>
                         <p className="font-inter text-white/50 text-xs">{project.before.desc}</p>
                         {project.before.image && (
-                          <div className="rounded-xl overflow-hidden border border-red-700/20 bg-black/20">
-                            <img src={project.before.image} alt="Antes" className="w-full object-cover object-top" style={{ height: "220px" }} />
-                          </div>
-                        )}
+                           <div className="rounded-xl overflow-hidden border border-red-700/20 bg-black/20 flex items-center justify-center" style={{ height: "280px" }}>
+                             <img src={project.before.image} alt="Antes" className="w-full h-full object-contain" />
+                           </div>
+                         )}
                       </div>
                       {/* After */}
                       <div className={`bg-gradient-to-br ${project.after.color} p-5 flex flex-col gap-3`}>
@@ -111,10 +111,10 @@ export default function PortfolioSection() {
                         </div>
                         <p className="font-inter text-white/50 text-xs">{project.after.desc}</p>
                         {project.after.image && (
-                          <div className="rounded-xl overflow-hidden border border-purple-600/30 bg-black/20">
-                            <img src={project.after.image} alt="Depois" className="w-full object-cover object-top" style={{ height: "220px" }} />
-                          </div>
-                        )}
+                           <div className="rounded-xl overflow-hidden border border-purple-600/30 bg-black/20 flex items-center justify-center" style={{ height: "280px" }}>
+                             <img src={project.after.image} alt="Depois" className="w-full h-full object-contain" />
+                           </div>
+                         )}
                       </div>
                     </div>
                   </motion.div>
