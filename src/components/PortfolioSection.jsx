@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { ExternalLink, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, X, ZoomIn } from "lucide-react";
 
 const PROJECTS = [
   {
@@ -28,8 +28,39 @@ const PROJECTS = [
 
 export default function PortfolioSection() {
   const [active, setActive] = useState(null);
+  const [lightbox, setLightbox] = useState(null); // { src, alt }
 
   return (
+    <>
+    {/* Lightbox */}
+    <AnimatePresence>
+      {lightbox && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+            onClick={() => setLightbox(null)}
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+          <motion.img
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.85, opacity: 0 }}
+            transition={{ type: "spring", damping: 20 }}
+            src={lightbox.src}
+            alt={lightbox.alt}
+            className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
     <section id="portfolio" className="relative py-24 px-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -99,8 +130,15 @@ export default function PortfolioSection() {
                         </div>
                         <p className="font-inter text-white/50 text-xs">{project.before.desc}</p>
                         {project.before.image && (
-                           <div className="rounded-xl overflow-hidden border border-red-700/20 bg-black/20 flex items-center justify-center" style={{ height: "280px" }}>
-                             <img src={project.before.image} alt="Antes" className="w-full h-full object-contain" />
+                           <div
+                             className="relative group rounded-xl overflow-hidden border border-red-700/20 bg-black/20 flex items-center justify-center cursor-zoom-in"
+                             style={{ height: "280px" }}
+                             onClick={(e) => { e.stopPropagation(); setLightbox({ src: project.before.image, alt: "Antes" }); }}
+                           >
+                             <img src={project.before.image} alt="Antes" className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
+                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                               <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                             </div>
                            </div>
                          )}
                       </div>
@@ -111,8 +149,15 @@ export default function PortfolioSection() {
                         </div>
                         <p className="font-inter text-white/50 text-xs">{project.after.desc}</p>
                         {project.after.image && (
-                           <div className="rounded-xl overflow-hidden border border-purple-600/30 bg-black/20 flex items-center justify-center" style={{ height: "280px" }}>
-                             <img src={project.after.image} alt="Depois" className="w-full h-full object-contain" />
+                           <div
+                             className="relative group rounded-xl overflow-hidden border border-purple-600/30 bg-black/20 flex items-center justify-center cursor-zoom-in"
+                             style={{ height: "280px" }}
+                             onClick={(e) => { e.stopPropagation(); setLightbox({ src: project.after.image, alt: "Depois" }); }}
+                           >
+                             <img src={project.after.image} alt="Depois" className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
+                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                               <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                             </div>
                            </div>
                          )}
                       </div>
@@ -144,5 +189,6 @@ export default function PortfolioSection() {
         </motion.div>
       </div>
     </section>
+    </>
   );
 }

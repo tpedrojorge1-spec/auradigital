@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock, Eye, EyeOff, ArrowLeft, Package, CheckCircle, Clock, XCircle,
@@ -93,6 +93,8 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
   const [expanded, setExpanded] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const btnRef = useRef(null);
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0 });
 
   const changeStatus = async (newStatus) => {
     setUpdating(true);
@@ -102,6 +104,15 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
   };
 
   const activeStatuses = ALL_STATUSES.filter(s => !["pendente","pago"].includes(s.key));
+
+  const openDropdown = (e) => {
+    e.stopPropagation();
+    if (!statusOpen && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setDropPos({ top: rect.bottom + 4, left: rect.left });
+    }
+    setStatusOpen(!statusOpen);
+  };
 
   return (
     <motion.div
@@ -135,7 +146,7 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="border-t border-purple-800/20 rounded-b-2xl overflow-visible"
+            className="border-t border-purple-800/20 rounded-b-2xl"
           >
             <div className="p-5 space-y-4">
               {/* Info */}
@@ -157,11 +168,12 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
               )}
 
               {/* Actions */}
-              <div className="flex flex-wrap gap-2 pt-1" style={{ overflow: "visible" }}>
+              <div className="flex flex-wrap gap-2 pt-1">
                 {/* Status dropdown */}
-                <div className="relative" style={{ zIndex: 100 }}>
+                <div className="relative">
                   <button
-                    onClick={(e) => { e.stopPropagation(); setStatusOpen(!statusOpen); }}
+                    ref={btnRef}
+                    onClick={openDropdown}
                     disabled={updating}
                     className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-900/30 border border-purple-700/40 text-purple-300 text-xs font-inter hover:bg-purple-900/50 transition-colors"
                   >
@@ -171,27 +183,30 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
                   </button>
                   <AnimatePresence>
                     {statusOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                        transition={{ duration: 0.15 }}
-                        onClick={(e) => e.stopPropagation()}
-                        className="absolute left-0 top-full mt-1 bg-[#0d0720] border border-purple-700/40 rounded-xl shadow-2xl shadow-purple-900/40 min-w-[220px]"
-                        style={{ zIndex: 9999 }}
-                      >
-                        {activeStatuses.map((s) => (
-                          <button
-                            key={s.key}
-                            onClick={() => changeStatus(s.key)}
-                            className={`w-full flex items-center gap-2 px-4 py-3 text-xs font-inter hover:bg-white/5 transition-colors text-left first:rounded-t-xl last:rounded-b-xl ${s.color} ${order.status === s.key ? "bg-white/5" : ""}`}
-                          >
-                            <s.icon className="w-3.5 h-3.5 flex-shrink-0" />
-                            <span>{s.label}</span>
-                            {order.status === s.key && <span className="ml-auto text-[9px] opacity-60 bg-white/10 px-1.5 py-0.5 rounded">atual</span>}
-                          </button>
-                        ))}
-                      </motion.div>
+                      <>
+                        <div className="fixed inset-0 z-[999]" onClick={(e) => { e.stopPropagation(); setStatusOpen(false); }} />
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                          transition={{ duration: 0.15 }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="fixed bg-[#0d0720] border border-purple-700/40 rounded-xl shadow-2xl shadow-purple-900/40 min-w-[220px]"
+                          style={{ zIndex: 10000, top: dropPos.top, left: dropPos.left }}
+                        >
+                          {activeStatuses.map((s) => (
+                            <button
+                              key={s.key}
+                              onClick={() => changeStatus(s.key)}
+                              className={`w-full flex items-center gap-2 px-4 py-3 text-xs font-inter hover:bg-white/5 transition-colors text-left first:rounded-t-xl last:rounded-b-xl ${s.color} ${order.status === s.key ? "bg-white/5" : ""}`}
+                            >
+                              <s.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                              <span>{s.label}</span>
+                              {order.status === s.key && <span className="ml-auto text-[9px] opacity-60 bg-white/10 px-1.5 py-0.5 rounded">atual</span>}
+                            </button>
+                          ))}
+                        </motion.div>
+                      </>
                     )}
                   </AnimatePresence>
                 </div>
