@@ -19,7 +19,7 @@ const PROJECTS = [
       desc: "Site profissional com navegação clara e destaque nas especialidades com imagens.",
       color: "from-purple-900/30 to-violet-950/50",
       border: "border-purple-600/30",
-      image: "https://media.base44.com/images/public/6a1519af3c5bfa671071c0e7/fad3e7bf4_CapturadeTela92.png",
+      image: "https://media.base44.com/images/public/6a1519af3c5bfa671071c0e7/61d782f87_29b3507f-60a1-4149-8756-899781adc21d.png",
     },
     tag: "Premium",
     tagColor: "text-amber-300 bg-amber-900/20 border-amber-700/30",
