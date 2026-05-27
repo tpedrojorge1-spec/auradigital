@@ -12,7 +12,7 @@ const PROJECTS = [
       desc: "Layout genérico sem estrutura profissional. Difícil navegação e baixa conversão.",
       color: "from-red-900/30 to-red-950/50",
       border: "border-red-700/20",
-      image: "https://media.base44.com/images/public/6a1519af3c5bfa671071c0e7/df535f8b6_CapturadeTela91.png",
+      image: "https://media.base44.com/images/public/6a1519af3c5bfa671071c0e7/4bcd6c279_50508446-362e-46cc-8dd2-4edd9053fefd.png",
     },
     after: {
       label: "Depois",

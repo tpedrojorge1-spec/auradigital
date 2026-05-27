@@ -11,7 +11,7 @@ export default function HeroSection() {
   useEffect(() => {
     base44.entities.Stats.filter({ key: "clientes_atendidos" })
       .then((data) => {
-        const val = data?.[0]?.value || 0;
+        const val = data?.[0]?.value || 50;
         let n = 0;
         const step = Math.max(1, Math.floor(val / 30));
         const interval = setInterval(() => {
