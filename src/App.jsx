@@ -11,6 +11,9 @@ import MeusPedidos from './pages/MeusPedidos';
 import Privacidade from './pages/Privacidade';
 import Termos from './pages/Termos';
 
+// Páginas públicas (sem autenticação)
+const PUBLIC_PATHS = ['/privacidade', '/termos'];
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
@@ -36,8 +39,6 @@ const AuthenticatedApp = () => {
       <Route path="/" element={<Home />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/meus-pedidos" element={<MeusPedidos />} />
-      <Route path="/privacidade" element={<Privacidade />} />
-      <Route path="/termos" element={<Termos />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -45,14 +46,22 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <AuthenticatedApp />
-        </Router>
+    <QueryClientProvider client={queryClientInstance}>
+      <Router>
+        <Routes>
+          {/* Rotas públicas — sem AuthProvider */}
+          <Route path="/privacidade" element={<Privacidade />} />
+          <Route path="/termos" element={<Termos />} />
+          {/* Demais rotas — com autenticação */}
+          <Route path="*" element={
+            <AuthProvider>
+              <AuthenticatedApp />
+            </AuthProvider>
+          } />
+        </Routes>
         <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+      </Router>
+    </QueryClientProvider>
   );
 }
 
