@@ -153,7 +153,7 @@ function OrderCard({ order, onStatusChange, onSoftDelete }) {
               <div className="grid grid-cols-2 gap-3 text-xs font-inter">
                 {[
                   ["Telefone", order.client_phone || "—"],
-                  ["Pagamento", order.payment_method?.toUpperCase()],
+                  ["Pagamento", order.payment_method === "cartao" ? "💳 Cartão (Stripe)" : order.payment_method?.toUpperCase()],
                   ["Data", new Date(order.created_date).toLocaleString("pt-BR")],
                   ["ID", order.id?.slice(0, 8) + "..."],
                 ].map(([l, v]) => (

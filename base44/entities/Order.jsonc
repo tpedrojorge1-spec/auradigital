@@ -31,7 +31,8 @@
       "type": "string",
       "enum": [
         "pix",
-        "boleto"
+        "boleto",
+        "cartao"
       ],
       "description": "Forma de pagamento"
     },
@@ -47,6 +48,10 @@
       ],
       "default": "aguardando_pagamento",
       "description": "Status do pedido"
+    },
+    "stripe_session_id": {
+      "type": "string",
+      "description": "ID da sess\u00e3o Stripe para evitar duplicatas"
     },
     "notes": {
       "type": "string",
