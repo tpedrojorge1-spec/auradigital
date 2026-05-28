@@ -90,7 +90,7 @@ export default function PaymentModal({ plan, onClose }) {
   const [sendingReceipt, setSendingReceipt] = useState(null);
   const [receiptSent, setReceiptSent] = useState(null);
   const [orderId, setOrderId] = useState(null);
-  const [stripeLoading, setStripeLoading] = useState(false);
+  const [mpLoading, setMpLoading] = useState(false);
 
   const pixData = PIX_DATA[plan.name] || PIX_DATA.Essencial;
 
@@ -111,22 +111,21 @@ export default function PaymentModal({ plan, onClose }) {
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
 
-    // Cartão via Stripe: redireciona diretamente
+    // Cartão via Mercado Pago: redireciona para checkout MP
     if (tab === "cartao") {
-      // Bloqueia se estiver em iframe (preview)
       if (window.self !== window.top) {
         alert("O pagamento por cartão funciona apenas no site publicado. Acesse o site diretamente para pagar com cartão.");
         return;
       }
-      setStripeLoading(true);
-      const res = await base44.functions.invoke("stripeCheckout", {
+      setMpLoading(true);
+      const res = await base44.functions.invoke("mpCheckout", {
         plan: plan.name,
         client_name: sanitize(form.name, 100),
         client_email: sanitize(form.email, 150).toLowerCase(),
         success_url: window.location.origin + "/meus-pedidos",
         cancel_url: window.location.href,
       });
-      setStripeLoading(false);
+      setMpLoading(false);
       if (res.data?.url) {
         window.location.href = res.data.url;
       }
@@ -240,12 +239,12 @@ export default function PaymentModal({ plan, onClose }) {
                      </div>
                     </div>
 
-                    <button type="submit" disabled={loading || stripeLoading}
+                    <button type="submit" disabled={loading || mpLoading}
                       className="w-full btn-primary-aura py-3.5 rounded-xl text-white font-bold tracking-wider text-sm mt-2">
-                      {(loading || stripeLoading) ? (
+                      {(loading || mpLoading) ? (
                         <span className="flex items-center justify-center gap-2">
                           <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          {stripeLoading ? "Redirecionando para Stripe..." : "Processando..."}
+                          {mpLoading ? "Redirecionando para Mercado Pago..." : "Processando..."}
                         </span>
                       ) : tab === "cartao" ? "💳 Pagar com Cartão" : "Continuar para Pagamento →"}
                     </button>
