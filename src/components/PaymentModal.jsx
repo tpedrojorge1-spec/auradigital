@@ -90,6 +90,7 @@ export default function PaymentModal({ plan, onClose }) {
   const [sendingReceipt, setSendingReceipt] = useState(null);
   const [receiptSent, setReceiptSent] = useState(null);
   const [orderId, setOrderId] = useState(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
 
   const pixData = PIX_DATA[plan.name] || PIX_DATA.Essencial;
 
@@ -109,6 +110,29 @@ export default function PaymentModal({ plan, onClose }) {
     const errs = validate(form);
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
+
+    // Cartão via Stripe: redireciona diretamente
+    if (tab === "cartao") {
+      // Bloqueia se estiver em iframe (preview)
+      if (window.self !== window.top) {
+        alert("O pagamento por cartão funciona apenas no site publicado. Acesse o site diretamente para pagar com cartão.");
+        return;
+      }
+      setStripeLoading(true);
+      const res = await base44.functions.invoke("stripeCheckout", {
+        plan: plan.name,
+        client_name: sanitize(form.name, 100),
+        client_email: sanitize(form.email, 150).toLowerCase(),
+        success_url: window.location.origin + "/meus-pedidos",
+        cancel_url: window.location.href,
+      });
+      setStripeLoading(false);
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      }
+      return;
+    }
+
     setLoading(true);
     const order = await base44.entities.Order.create({
       client_name: sanitize(form.name, 100),
@@ -118,7 +142,7 @@ export default function PaymentModal({ plan, onClose }) {
       plan_price: pixData.value,
       payment_method: tab,
       notes: sanitize(form.notes, 500),
-      status: "pendente",
+      status: "aguardando_pagamento",
     });
     setOrderId(order.id);
     setLoading(false);
@@ -201,20 +225,29 @@ export default function PaymentModal({ plan, onClose }) {
 
                     {/* Forma de pagamento */}
                     <div>
-                      <label className="font-inter text-xs text-white/50 tracking-wider uppercase block mb-2">Forma de Pagamento</label>
-                      <div className="flex gap-3">
-                        {["pix", "boleto"].map((t) => (
-                          <button key={t} type="button" onClick={() => setTab(t)}
-                            className={`flex-1 py-2.5 rounded-xl text-sm font-semibold font-inter tracking-wider uppercase transition-all ${tab === t ? "bg-purple-700 text-white border border-purple-500" : "bg-white/5 text-white/40 border border-white/10 hover:border-purple-700/40"}`}>
-                            {t === "pix" ? "💠 PIX" : "📄 Boleto"}
-                          </button>
-                        ))}
-                      </div>
+                     <label className="font-inter text-xs text-white/50 tracking-wider uppercase block mb-2">Forma de Pagamento</label>
+                     <div className="flex gap-2">
+                       {[
+                         { key: "pix", label: "💠 PIX" },
+                         { key: "boleto", label: "📄 Boleto" },
+                         { key: "cartao", label: "💳 Cartão" },
+                       ].map((t) => (
+                         <button key={t.key} type="button" onClick={() => setTab(t.key)}
+                           className={`flex-1 py-2.5 rounded-xl text-xs font-semibold font-inter tracking-wider uppercase transition-all ${tab === t.key ? "bg-purple-700 text-white border border-purple-500" : "bg-white/5 text-white/40 border border-white/10 hover:border-purple-700/40"}`}>
+                           {t.label}
+                         </button>
+                       ))}
+                     </div>
                     </div>
 
-                    <button type="submit" disabled={loading}
+                    <button type="submit" disabled={loading || stripeLoading}
                       className="w-full btn-primary-aura py-3.5 rounded-xl text-white font-bold tracking-wider text-sm mt-2">
-                      {loading ? "Processando..." : "Continuar para Pagamento →"}
+                      {(loading || stripeLoading) ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          {stripeLoading ? "Redirecionando para Stripe..." : "Processando..."}
+                        </span>
+                      ) : tab === "cartao" ? "💳 Pagar com Cartão" : "Continuar para Pagamento →"}
                     </button>
                   </form>
                 )}
