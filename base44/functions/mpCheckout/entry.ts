@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const PLAN_PRICES = {
-  Essencial: 1,
+  Essencial: 900,
   Profissional: 1300,
   Premium: 1800,
 };
@@ -42,9 +42,13 @@ Deno.serve(async (req) => {
         plan,
         client_name: client_name || '',
         client_email: client_email || '',
+        plan_price: PLAN_PRICES[plan],
       }),
       statement_descriptor: 'AUREON DIGITAL',
+      notification_url: 'https://base44.app/api/functions/mpWebhook',
     };
+
+    console.log('Criando preferência MP para plano:', plan, '| valor:', PLAN_PRICES[plan]);
 
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
@@ -59,12 +63,14 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       console.error('MP API error:', JSON.stringify(data));
-      return Response.json({ error: data.message || 'Erro ao criar preferência' }, { status: 500 });
+      return Response.json({ error: data.message || 'Erro ao criar preferência MP' }, { status: 500 });
     }
 
-    return Response.json({ url: data.init_point });
+    console.log('Preferência criada com sucesso. init_point:', data.init_point);
+    return Response.json({ url: data.init_point, preference_id: data.id });
+
   } catch (error) {
-    console.error('mpCheckout error:', error);
+    console.error('mpCheckout error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
