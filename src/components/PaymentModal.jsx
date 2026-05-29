@@ -225,7 +225,6 @@ export default function PaymentModal({ plan, onClose }) {
                        {[
                          { key: "pix", label: "💠 PIX" },
                          { key: "boleto", label: "📄 Boleto" },
-                         { key: "cartao", label: "💳 Cartão" },
                        ].map((t) => (
                          <button key={t.key} type="button" onClick={() => setTab(t.key)}
                            className={`flex-1 py-2.5 rounded-xl text-xs font-semibold font-inter tracking-wider uppercase transition-all ${tab === t.key ? "bg-purple-700 text-white border border-purple-500" : "bg-white/5 text-white/40 border border-white/10 hover:border-purple-700/40"}`}>
