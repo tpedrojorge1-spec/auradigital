@@ -62,8 +62,8 @@ Deno.serve(async (req) => {
       return Response.json({ error: data.message || 'Erro ao criar preferência' }, { status: 500 });
     }
 
-    // Retorna o link de pagamento (init_point = produção, sandbox_init_point = teste)
-    return Response.json({ url: data.init_point, sandbox_url: data.sandbox_init_point });
+    // MODO TESTE: usa sandbox_init_point. Trocar para init_point em produção.
+    return Response.json({ url: data.sandbox_init_point, sandbox_url: data.sandbox_init_point });
   } catch (error) {
     console.error('mpCheckout error:', error);
     return Response.json({ error: error.message }, { status: 500 });
