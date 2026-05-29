@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
     }
 
     // Usa token de teste (MP_ACCESS_TOKEN_TEST) para sandbox
-    const accessToken = Deno.env.get('MP_ACCESS_TOKEN_TEST') || Deno.env.get('MP_ACCESS_TOKEN');
+    const accessToken = Deno.env.get('TEST-6712344852631985-052808-fa3a6cbb1e2f69d22a2a88e00956b728-584390074') || Deno.env.get('MP_ACCESS_TOKEN');
     if (!accessToken) {
       return Response.json({ error: 'MP_ACCESS_TOKEN_TEST ou MP_ACCESS_TOKEN não configurado' }, { status: 500 });
     }
