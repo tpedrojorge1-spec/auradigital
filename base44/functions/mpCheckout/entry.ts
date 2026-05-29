@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const PLAN_PRICES = {
-  Essencial: 1,
+  Essencial: 900,
   Profissional: 1300,
   Premium: 1800,
 };
