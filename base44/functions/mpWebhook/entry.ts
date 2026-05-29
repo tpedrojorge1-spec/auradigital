@@ -1,19 +1,48 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
+  // MP faz GET para validar a URL do webhook
+  if (req.method === 'GET') {
+    return new Response('OK', { status: 200 });
+  }
+
   try {
     const accessToken = Deno.env.get('MP_ACCESS_TOKEN');
 
-    // MP envia notificação via POST
-    const body = await req.json();
-    console.log('MP Webhook received:', JSON.stringify(body));
+    // Suporta JSON e form-urlencoded
+    let body = {};
+    const contentType = req.headers.get('content-type') || '';
+    const rawText = await req.text();
+    console.log('MP Webhook raw body:', rawText);
+    console.log('Content-Type:', contentType);
 
-    // Só processa pagamentos aprovados
-    if (body.type !== 'payment') {
+    if (contentType.includes('application/json')) {
+      body = JSON.parse(rawText);
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      const params = new URLSearchParams(rawText);
+      body = Object.fromEntries(params.entries());
+    } else {
+      // Tenta JSON mesmo sem content-type correto
+      try { body = JSON.parse(rawText); } catch { body = {}; }
+    }
+
+    console.log('MP Webhook parsed body:', JSON.stringify(body));
+
+    // Também verifica query params (MP às vezes envia id via query)
+    const url = new URL(req.url);
+    const queryId = url.searchParams.get('id');
+    const queryTopic = url.searchParams.get('topic') || url.searchParams.get('type');
+
+    const notificationType = body.type || queryTopic;
+    const paymentId = body.data?.id || body.id || queryId;
+
+    console.log('Type:', notificationType, '| PaymentId:', paymentId);
+
+    // Aceita "payment" ou "merchant_order" com topic "payment"
+    if (notificationType !== 'payment' && queryTopic !== 'payment') {
       return Response.json({ ok: true });
     }
 
-    const paymentId = body.data?.id;
     if (!paymentId) {
       return Response.json({ ok: true });
     }
@@ -23,14 +52,13 @@ Deno.serve(async (req) => {
       headers: { 'Authorization': `Bearer ${accessToken}` },
     });
     const payment = await mpRes.json();
-    console.log('MP Payment:', JSON.stringify(payment));
+    console.log('MP Payment status:', payment.status);
 
     if (payment.status !== 'approved') {
-      console.log('Payment not approved, status:', payment.status);
       return Response.json({ ok: true });
     }
 
-    // Extrai dados do external_reference (enviado no checkout)
+    // Extrai dados do external_reference
     let planData = {};
     try {
       planData = JSON.parse(payment.external_reference || '{}');
@@ -43,10 +71,9 @@ Deno.serve(async (req) => {
     const client_email = planData.client_email || payment.payer?.email || '';
     const plan_price = payment.transaction_amount || 0;
 
-    // Cria SDK com service role para criar o pedido
     const base44 = createClientFromRequest(req);
 
-    // Verifica se já existe pedido com este payment_id (evita duplicatas)
+    // Verifica duplicata
     const existing = await base44.asServiceRole.entities.Order.filter({
       stripe_session_id: String(paymentId),
     });
@@ -64,13 +91,13 @@ Deno.serve(async (req) => {
       plan_price,
       payment_method: 'cartao',
       status: 'pagamento_confirmado',
-      stripe_session_id: String(paymentId), // reuso do campo para armazenar MP payment ID
+      stripe_session_id: String(paymentId),
       notes: `Pago via Mercado Pago. ID: ${paymentId}`,
     });
 
     console.log('Order created:', order.id);
 
-    // Envia e-mail de confirmação ao cliente
+    // Envia e-mail de confirmação
     if (client_email) {
       await base44.asServiceRole.integrations.Core.SendEmail({
         from_name: 'Aureon Digital',
