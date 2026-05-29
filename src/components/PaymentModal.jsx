@@ -146,10 +146,11 @@ export default function PaymentModal({ plan, onClose }) {
 
   const handleFinalConfirm = () => setSubmitted(true);
 
-  const sendReceiptWhatsApp = () => {
+  const sendReceiptWhatsApp = (metodo) => {
+    const isBoleto = (metodo || tab) === "boleto";
     const msg = encodeURIComponent(
-      tab === "boleto"
-        ? `Aguardo o boleto , meio de pagamento: boleto\n\nPlano: ${plan.name} - R$ ${pixData.value.toLocaleString("pt-BR")}\nNome: ${form.name}\nE-mail: ${form.email}`
+      isBoleto
+        ? `Olá! Aguardo o boleto para o pagamento.\n\nPlano: ${plan.name} - R$ ${pixData.value.toLocaleString("pt-BR")}\nNome: ${form.name}\nE-mail: ${form.email}\nForma: Boleto`
         : `Olá! Acabei de realizar o pagamento do Plano ${plan.name} - R$ ${pixData.value.toLocaleString("pt-BR")}.\n\nNome: ${form.name}\nE-mail: ${form.email}\nForma: PIX\n\nAguardo a confirmação. Obrigado!`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
@@ -328,7 +329,7 @@ export default function PaymentModal({ plan, onClose }) {
                         <div className="border border-purple-800/30 rounded-xl p-4 space-y-3">
                           <p className="font-inter text-xs text-white/50 uppercase tracking-wider">Receber boleto / notificação</p>
                           <div className="flex gap-2">
-                            <button onClick={sendReceiptWhatsApp}
+                            <button onClick={() => sendReceiptWhatsApp("boleto")}
                               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-inter font-medium transition-all ${receiptSent === "whatsapp" ? "bg-green-600/20 border-green-500/50 text-green-400" : "bg-white/5 border-white/10 text-white/60 hover:border-green-500/40 hover:text-green-400"}`}>
                               {receiptSent === "whatsapp" ? <Check className="w-4 h-4" /> : <MessageCircle className="w-4 h-4" />}
                               {receiptSent === "whatsapp" ? "Enviado!" : "WhatsApp"}
