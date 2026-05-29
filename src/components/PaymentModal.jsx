@@ -113,10 +113,6 @@ export default function PaymentModal({ plan, onClose }) {
 
     // Cartão via Mercado Pago: redireciona para checkout MP
     if (tab === "cartao") {
-      if (window.self !== window.top) {
-        alert("O pagamento por cartão funciona apenas no site publicado. Acesse o site diretamente para pagar com cartão.");
-        return;
-      }
       setMpLoading(true);
       const res = await base44.functions.invoke("mpCheckout", {
         plan: plan.name,
