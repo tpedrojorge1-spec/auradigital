@@ -55,15 +55,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify(preference),
     });
 
-    console.log('Token prefix:', accessToken.substring(0, 20));
-    const rawText = await response.text();
-    console.log('MP API status:', response.status);
-    console.log('MP API raw response:', rawText);
-
-    let data;
-    try { data = JSON.parse(rawText); } catch(e) {
-      return Response.json({ error: 'Resposta inválida da API MP: ' + rawText }, { status: 500 });
-    }
+    const data = await response.json();
 
     if (!response.ok) {
       console.error('MP API error:', JSON.stringify(data));
