@@ -148,7 +148,9 @@ export default function PaymentModal({ plan, onClose }) {
 
   const sendReceiptWhatsApp = () => {
     const msg = encodeURIComponent(
-      `Olá! Acabei de realizar o pagamento do Plano ${plan.name} - R$ ${pixData.value.toLocaleString("pt-BR")}.\n\nNome: ${form.name}\nE-mail: ${form.email}\nForma: PIX\n\nAguardo a confirmação. Obrigado!`
+      tab === "boleto"
+        ? `Aguardo o boleto , meio de pagamento: boleto\n\nPlano: ${plan.name} - R$ ${pixData.value.toLocaleString("pt-BR")}\nNome: ${form.name}\nE-mail: ${form.email}`
+        : `Olá! Acabei de realizar o pagamento do Plano ${plan.name} - R$ ${pixData.value.toLocaleString("pt-BR")}.\n\nNome: ${form.name}\nE-mail: ${form.email}\nForma: PIX\n\nAguardo a confirmação. Obrigado!`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
     setReceiptSent("whatsapp");
@@ -241,7 +243,7 @@ export default function PaymentModal({ plan, onClose }) {
                           <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           {mpLoading ? "Redirecionando para Mercado Pago..." : "Processando..."}
                         </span>
-                      ) : tab === "cartao" ? "💳 Pagar com Cartão" : "Continuar para Pagamento →"}
+                      ) : "Continuar para Pagamento →"}
                     </button>
                   </form>
                 )}
