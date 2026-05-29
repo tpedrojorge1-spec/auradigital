@@ -14,9 +14,10 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Plano inválido' }, { status: 400 });
     }
 
-    const accessToken = Deno.env.get('MP_ACCESS_TOKEN');
+    // Usa token de teste (MP_ACCESS_TOKEN_TEST) para sandbox
+    const accessToken = Deno.env.get('MP_ACCESS_TOKEN_TEST') || Deno.env.get('MP_ACCESS_TOKEN');
     if (!accessToken) {
-      return Response.json({ error: 'MP_ACCESS_TOKEN não configurado' }, { status: 500 });
+      return Response.json({ error: 'MP_ACCESS_TOKEN_TEST ou MP_ACCESS_TOKEN não configurado' }, { status: 500 });
     }
 
     const preference = {
