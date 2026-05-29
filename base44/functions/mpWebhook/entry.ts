@@ -1,8 +1,15 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
-  // MP faz GET para validar a URL do webhook
-  if (req.method === 'GET') {
+  console.log('MP Webhook method:', req.method);
+
+  // Aceita GET e HEAD para validação de URL
+  if (req.method === 'GET' || req.method === 'HEAD') {
+    return new Response('OK', { status: 200 });
+  }
+
+  // Rejeita apenas métodos que não sejam POST
+  if (req.method !== 'POST') {
     return new Response('OK', { status: 200 });
   }
 
