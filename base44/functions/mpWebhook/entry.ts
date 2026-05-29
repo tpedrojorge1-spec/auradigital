@@ -3,42 +3,35 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   console.log('MP Webhook method:', req.method);
 
-  // Aceita GET e HEAD para validação de URL
-  if (req.method === 'GET' || req.method === 'HEAD') {
-    return new Response('OK', { status: 200 });
-  }
-
-  // Rejeita apenas métodos que não sejam POST
-  if (req.method !== 'POST') {
-    return new Response('OK', { status: 200 });
+  // HEAD: só valida que a URL existe
+  if (req.method === 'HEAD') {
+    return new Response(null, { status: 200 });
   }
 
   try {
     const accessToken = Deno.env.get('MP_ACCESS_TOKEN');
 
-    // Suporta JSON e form-urlencoded
-    let body = {};
-    const contentType = req.headers.get('content-type') || '';
-    const rawText = await req.text();
-    console.log('MP Webhook raw body:', rawText);
-    console.log('Content-Type:', contentType);
-
-    if (contentType.includes('application/json')) {
-      body = JSON.parse(rawText);
-    } else if (contentType.includes('application/x-www-form-urlencoded')) {
-      const params = new URLSearchParams(rawText);
-      body = Object.fromEntries(params.entries());
-    } else {
-      // Tenta JSON mesmo sem content-type correto
-      try { body = JSON.parse(rawText); } catch { body = {}; }
-    }
-
-    console.log('MP Webhook parsed body:', JSON.stringify(body));
-
-    // Também verifica query params (MP às vezes envia id via query)
+    // Lê query params (IPN envia GET com ?topic=payment&id=xxx)
     const url = new URL(req.url);
     const queryId = url.searchParams.get('id');
     const queryTopic = url.searchParams.get('topic') || url.searchParams.get('type');
+
+    // Lê body (Webhook envia POST com JSON)
+    let body = {};
+    if (req.method === 'POST') {
+      const contentType = req.headers.get('content-type') || '';
+      const rawText = await req.text();
+      console.log('MP raw body:', rawText, '| Content-Type:', contentType);
+      if (contentType.includes('application/json')) {
+        try { body = JSON.parse(rawText); } catch { body = {}; }
+      } else if (contentType.includes('application/x-www-form-urlencoded')) {
+        body = Object.fromEntries(new URLSearchParams(rawText).entries());
+      } else {
+        try { body = JSON.parse(rawText); } catch { body = {}; }
+      }
+    }
+
+    console.log('MP body:', JSON.stringify(body), '| query topic:', queryTopic, '| query id:', queryId);
 
     const notificationType = body.type || queryTopic;
     const paymentId = body.data?.id || body.id || queryId;
