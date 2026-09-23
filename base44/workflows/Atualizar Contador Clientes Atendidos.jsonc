@@ -1,0 +1,38 @@
+{
+  "name": "Atualizar Contador Clientes Atendidos",
+  "description": "Incrementa ou decrementa o contador de clientes atendidos quando o status do pedido muda para pago/confirmado ou \u00e9 cancelado",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update"
+      ],
+      "entity_name": "Order"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "atualizar_contador_clientes_atendidos",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "updateClientesAtendidos",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "updateClientesAtendidos"
+  }
+}
